@@ -1,0 +1,13 @@
+<h1>People</h1>
+<ul>
+  <% User.where.not(id: current_user.id).each do |u| %>
+    <li>
+      <%= link_to (u.profile.display_name), user_profile_path(u) %>
+      <% unless current_user.following.include?(u) || current_user.active_follows.exists?(followed: u, status: :pending) %>
+        <%= button_to "Follow", user_follows_path(u) %>
+      <% else %>
+        <em>Following or pending</em>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

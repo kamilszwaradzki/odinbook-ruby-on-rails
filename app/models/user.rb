@@ -11,8 +11,8 @@ class User < ApplicationRecord
   has_many :active_follows,  class_name: "Follow", foreign_key: :follower_id, dependent: :destroy
   has_many :passive_follows, class_name: "Follow", foreign_key: :followed_id, dependent: :destroy
 
-  has_many :following, through: :active_follows,  source: :followed, -> { where(follows: { status: :accepted }) }
-  has_many :followers, through: :passive_follows, source: :follower, -> { where(follows: { status: :accepted }) }
+  has_many :following,-> { where(follows: { status: :accepted }) }, through: :active_follows,  source: :followed
+  has_many :followers,-> { where(follows: { status: :accepted }) }, through: :passive_follows, source: :follower
 
   after_create :build_default_profile
   after_commit :send_welcome_email, on: :create

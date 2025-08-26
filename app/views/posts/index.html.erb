@@ -1,0 +1,38 @@
+<h1>Feed</h1>
+
+<%= form_with model: @post, url: posts_path, local: true do |f| %>
+  <p><%= f.text_area :body, rows: 3 %></p>
+  <%= f.submit "Post" %>
+<% end %>
+
+<hr>
+
+<% @posts.each do |post| %>
+  <article>
+    <p><strong><%= post.user.profile.display_name %></strong> · <%= time_ago_in_words(post.created_at) %> ago</p>
+    <p><%= post.body %></p>
+    <p>
+      Likes: <%= post.likes.count %>
+      <% if post.likes.exists?(user: current_user) %>
+        <%= button_to "Unlike", post_like_path(post), method: :delete %>
+      <% else %>
+        <%= button_to "Like", post_like_path(post) %>
+      <% end %>
+    </p>
+    <h4>Comments</h4>
+    <ul>
+      <% post.comments.each do |c| %>
+        <li><strong><%= c.user.profile.display_name %>:</strong> <%= c.body %>
+          <% if c.user == current_user || post.user == current_user %>
+            <%= link_to "×", post_comment_path(post, c), data: { turbo_method: :delete, turbo_confirm: "Delete?" } %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+    <%= form_with(model: [post, Comment.new], local: true) do |f| %>
+      <%= f.text_field :body, placeholder: "Write a comment..." %>
+      <%= f.submit "Comment" %>
+    <% end %>
+    <hr>
+  </article>
+<% end %>
